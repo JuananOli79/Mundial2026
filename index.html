@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Mundial 2026 Quiz</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== PANTALLA: INICIO ===================== -->
+<div id="screen-start" class="screen active">
+  <div class="start-bg">
+    <div class="stars">
+      <span>⭐</span><span>🌟</span><span>⭐</span><span>🌟</span><span>⭐</span>
+    </div>
+    <div class="trophy-big">🏆</div>
+    <h1 class="game-title">MUNDIAL<br><span>2026</span></h1>
+    <p class="game-subtitle">¡El Gran Quiz del Fútbol!</p>
+    <div class="player-select">
+      <div class="player-card" id="card-max" onclick="togglePlayer('max')">
+        <div class="player-avatar">⚽</div>
+        <div class="player-name">MAX</div>
+        <div class="player-status">Pulsa para jugar</div>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="player-card" id="card-martin" onclick="togglePlayer('martin')">
+        <div class="player-avatar">🥅</div>
+        <div class="player-name">MARTÍN</div>
+        <div class="player-status">Pulsa para jugar</div>
+      </div>
+    </div>
+    <button id="btn-start" class="btn-main disabled" onclick="startGame()">
+      ¡COMENZAR!
+    </button>
+    <p class="hint-text">Los dos jugadores deben estar listos</p>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: MARCADOR ENTRE TURNOS ===================== -->
+<div id="screen-scoreboard" class="screen">
+  <div class="scoreboard-header">
+    <h2>MARCADOR</h2>
+  </div>
+  <div class="scores-display">
+    <div class="score-card" id="score-max-card">
+      <div class="score-player">MAX ⚽</div>
+      <div class="score-value" id="score-max">0</div>
+      <div class="score-label">puntos</div>
+    </div>
+    <div class="score-divider">—</div>
+    <div class="score-card" id="score-martin-card">
+      <div class="score-player">MARTÍN 🥅</div>
+      <div class="score-value" id="score-martin">0</div>
+      <div class="score-label">puntos</div>
+    </div>
+  </div>
+  <div class="turn-announcement" id="turn-announcement">
+    <div class="turn-player" id="turn-player-name">MAX</div>
+    <div class="turn-text">¡Es tu turno!</div>
+    <div class="turn-emoji" id="turn-emoji">⚽</div>
+  </div>
+  <button class="btn-main" onclick="proceedToQuestion()">¡A JUGAR!</button>
+</div>
+
+<!-- ===================== PANTALLA: PREGUNTA TIPO TEST ===================== -->
+<div id="screen-quiz" class="screen">
+  <div class="question-header">
+    <div class="question-meta">
+      <span class="current-player-badge" id="quiz-player-badge">MAX</span>
+      <span class="question-counter" id="question-counter">P 1/20</span>
+      <span class="question-category" id="question-category">Historia</span>
+    </div>
+    <div class="timer-bar-container">
+      <div class="timer-bar" id="timer-bar"></div>
+    </div>
+    <div class="timer-text" id="timer-text">30</div>
+  </div>
+  <div class="question-body">
+    <div class="question-points" id="question-points">⭐ 1000 pts</div>
+    <div class="question-text" id="question-text">¿Pregunta aquí?</div>
+  </div>
+  <div class="options-grid" id="options-grid">
+    <!-- 4 buttons injected by JS -->
+  </div>
+  <div class="question-feedback hidden" id="question-feedback">
+    <div class="feedback-icon" id="feedback-icon">✅</div>
+    <div class="feedback-text" id="feedback-text">¡Correcto!</div>
+    <div class="feedback-explanation" id="feedback-explanation"></div>
+    <div class="feedback-points" id="feedback-points">+1000 pts</div>
+    <button class="btn-main" onclick="nextTurn()">Siguiente</button>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: VERDADERO/FALSO ===================== -->
+<div id="screen-truefalse" class="screen">
+  <div class="question-header">
+    <div class="question-meta">
+      <span class="current-player-badge" id="tf-player-badge">MAX</span>
+      <span class="question-counter" id="tf-counter">P 1/20</span>
+      <span class="question-category">Verdad o Mentira</span>
+    </div>
+    <div class="timer-bar-container">
+      <div class="timer-bar" id="tf-timer-bar"></div>
+    </div>
+    <div class="timer-text" id="tf-timer-text">15</div>
+  </div>
+  <div class="question-body">
+    <div class="tf-icon">🤔</div>
+    <div class="question-text" id="tf-question-text">¿Es verdad?</div>
+  </div>
+  <div class="tf-buttons">
+    <button class="btn-true" onclick="answerTF(true)">
+      <span class="tf-emoji">✅</span>
+      <span>VERDADERO</span>
+    </button>
+    <button class="btn-false" onclick="answerTF(false)">
+      <span class="tf-emoji">❌</span>
+      <span>FALSO</span>
+    </button>
+  </div>
+  <div class="question-feedback hidden" id="tf-feedback">
+    <div class="feedback-icon" id="tf-feedback-icon">✅</div>
+    <div class="feedback-text" id="tf-feedback-text">¡Correcto!</div>
+    <div class="feedback-explanation" id="tf-feedback-explanation"></div>
+    <div class="feedback-points" id="tf-feedback-points">+500 pts</div>
+    <button class="btn-main" onclick="nextTurn()">Siguiente</button>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: COMPLETA LA FRASE ===================== -->
+<div id="screen-fillblank" class="screen">
+  <div class="question-header">
+    <div class="question-meta">
+      <span class="current-player-badge" id="fb-player-badge">MAX</span>
+      <span class="question-counter" id="fb-counter">P 1/20</span>
+      <span class="question-category">Completa la frase</span>
+    </div>
+    <div class="timer-bar-container">
+      <div class="timer-bar" id="fb-timer-bar"></div>
+    </div>
+    <div class="timer-text" id="fb-timer-text">25</div>
+  </div>
+  <div class="question-body">
+    <div class="fb-icon">✏️</div>
+    <div class="question-text" id="fb-question-text">El campeón del mundo es ___</div>
+    <div class="answer-boxes" id="answer-boxes"></div>
+  </div>
+  <div class="letter-options" id="letter-options"></div>
+  <div class="question-feedback hidden" id="fb-feedback">
+    <div class="feedback-icon" id="fb-feedback-icon">✅</div>
+    <div class="feedback-text" id="fb-feedback-text">¡Correcto!</div>
+    <div class="feedback-explanation" id="fb-feedback-explanation"></div>
+    <div class="feedback-points" id="fb-feedback-points">+800 pts</div>
+    <button class="btn-main" onclick="nextTurn()">Siguiente</button>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: ANAGRAMA ===================== -->
+<div id="screen-anagram" class="screen">
+  <div class="question-header">
+    <div class="question-meta">
+      <span class="current-player-badge" id="ag-player-badge">MAX</span>
+      <span class="question-counter" id="ag-counter">P 1/20</span>
+      <span class="question-category">Ordena las letras</span>
+    </div>
+    <div class="timer-bar-container">
+      <div class="timer-bar" id="ag-timer-bar"></div>
+    </div>
+    <div class="timer-text" id="ag-timer-text">25</div>
+  </div>
+  <div class="question-body">
+    <div class="ag-icon">🔤</div>
+    <div class="question-text" id="ag-hint-text">País sede del Mundial 2026</div>
+    <div class="answer-slots" id="answer-slots"></div>
+  </div>
+  <div class="scrambled-letters" id="scrambled-letters"></div>
+  <div class="question-feedback hidden" id="ag-feedback">
+    <div class="feedback-icon" id="ag-feedback-icon">✅</div>
+    <div class="feedback-text" id="ag-feedback-text">¡Correcto!</div>
+    <div class="feedback-explanation" id="ag-feedback-explanation"></div>
+    <div class="feedback-points" id="ag-feedback-points">+800 pts</div>
+    <button class="btn-main" onclick="nextTurn()">Siguiente</button>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: SOPA DE LETRAS ===================== -->
+<div id="screen-wordsearch" class="screen">
+  <div class="question-header">
+    <div class="question-meta">
+      <span class="current-player-badge" id="ws-player-badge">MAX</span>
+      <span class="question-counter" id="ws-counter">P 1/20</span>
+      <span class="question-category">Sopa de Letras</span>
+    </div>
+    <div class="timer-bar-container">
+      <div class="timer-bar" id="ws-timer-bar"></div>
+    </div>
+    <div class="timer-text" id="ws-timer-text">60</div>
+  </div>
+  <div class="ws-content">
+    <div class="ws-instructions">Encuentra estas palabras:</div>
+    <div class="ws-words-list" id="ws-words-list"></div>
+    <div class="ws-grid-container">
+      <div class="ws-grid" id="ws-grid"></div>
+    </div>
+  </div>
+  <div class="question-feedback hidden" id="ws-feedback">
+    <div class="feedback-icon">✅</div>
+    <div class="feedback-text" id="ws-feedback-text">¡Muy bien!</div>
+    <div class="feedback-points" id="ws-feedback-points">+1200 pts</div>
+    <button class="btn-main" onclick="nextTurn()">Siguiente</button>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA: FIN DEL JUEGO ===================== -->
+<div id="screen-end" class="screen">
+  <div class="end-bg">
+    <div class="fireworks">
+      <span>🎆</span><span>🎇</span><span>🎆</span><span>🎇</span><span>🎆</span>
+    </div>
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-text" id="winner-text">¡MAX GANA!</div>
+    <div class="final-scores">
+      <div class="final-score-card" id="end-score-max">
+        <div>MAX ⚽</div>
+        <div class="final-pts" id="final-pts-max">0</div>
+        <div>puntos</div>
+      </div>
+      <div class="final-score-card" id="end-score-martin">
+        <div>MARTÍN 🥅</div>
+        <div class="final-pts" id="final-pts-martin">0</div>
+        <div>puntos</div>
+      </div>
+    </div>
+    <div class="end-stats" id="end-stats"></div>
+    <button class="btn-main" onclick="restartGame()">🔄 JUGAR OTRA VEZ</button>
+    <button class="btn-secondary" onclick="showScreen('screen-start')">🏠 INICIO</button>
+  </div>
+</div>
+
+<!-- ===================== OVERLAY: CELEBRACIÓN ===================== -->
+<div id="overlay-celebrate" class="overlay hidden">
+  <div class="celebrate-content" id="celebrate-content">
+    <div class="celebrate-emoji" id="celebrate-emoji">🎉</div>
+    <div class="celebrate-text" id="celebrate-text">¡INCREÍBLE!</div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/questions.js"></script>
+<script src="js/wordsearch.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
